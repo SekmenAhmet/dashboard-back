@@ -1,0 +1,49 @@
+# Configuration Ruff pour le projet City Lifestyle Dashboard
+
+# Longueur de ligne maximale
+line-length = 120
+
+# Version Python cible
+target-version = "py311"
+
+# Sélectionner les règles à activer
+[lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "DTZ", # flake8-datetimez
+    "T10", # flake8-debugger
+    "DJ",  # flake8-django
+    "EM",  # flake8-errmsg
+    "ISC", # flake8-implicit-str-concat
+    "ICN", # flake8-import-conventions
+    "PIE", # flake8-pie
+    "PT",  # flake8-pytest-style
+    "Q",   # flake8-quotes
+    "RSE", # flake8-raise
+    "RET", # flake8-return
+    "SIM", # flake8-simplify
+    "PTH", # flake8-use-pathlib
+]
+
+ignore = [
+    "E501",   # Line too long (géré par le formatteur)
+    "B008",   # Function calls in argument defaults
+    "RET504", # Unnecessary variable assignment before return
+]
+
+# Configuration par fichier
+[lint.per-file-ignores]
+"__init__.py" = ["F401"]  # Imported but unused
+
+# Configuration du formatteur
+[format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
