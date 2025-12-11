@@ -1,0 +1,488 @@
+{
+	"info": {
+		"_postman_id": "city-lifestyle-dashboard-api",
+		"name": "City Lifestyle Dashboard API",
+		"description": "Collection complète pour l'API Flask du Dashboard City Lifestyle. Fournit des endpoints REST pour l'analyse des données urbaines.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "city-lifestyle-dashboard"
+	},
+	"item": [
+		{
+			"name": "Root",
+			"item": [
+				{
+					"name": "API Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
+						},
+						"description": "Endpoint racine avec informations sur l'API et la liste de tous les endpoints disponibles."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de base de l'API"
+		},
+		{
+			"name": "Overview & Statistics",
+			"item": [
+				{
+					"name": "Get Overview Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/overview",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"overview"
+							]
+						},
+						"description": "Récupère les statistiques générales du dashboard (nombre de villes, pays, moyennes, etc.)"
+					},
+					"response": []
+				}
+			],
+			"description": "Statistiques globales et vue d'ensemble"
+		},
+		{
+			"name": "Cities",
+			"item": [
+				{
+					"name": "Get Cities by Country",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cities/by-country",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cities",
+								"by-country"
+							]
+						},
+						"description": "Récupère la répartition des villes par pays."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Top Cities - Happiness Score",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cities/top/happiness_score?top_n=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cities",
+								"top",
+								"happiness_score"
+							],
+							"query": [
+								{
+									"key": "top_n",
+									"value": "10",
+									"description": "Nombre de villes à retourner (défaut: 10)"
+								}
+							]
+						},
+						"description": "Récupère le top N des villes selon le score de bonheur."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Top Cities - Average Income",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cities/top/avg_income?top_n=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cities",
+								"top",
+								"avg_income"
+							],
+							"query": [
+								{
+									"key": "top_n",
+									"value": "10",
+									"description": "Nombre de villes à retourner (défaut: 10)"
+								}
+							]
+						},
+						"description": "Récupère le top N des villes selon le revenu moyen."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Top Cities - Internet Penetration",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cities/top/internet_penetration?top_n=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cities",
+								"top",
+								"internet_penetration"
+							],
+							"query": [
+								{
+									"key": "top_n",
+									"value": "10",
+									"description": "Nombre de villes à retourner (défaut: 10)"
+								}
+							]
+						},
+						"description": "Récupère le top N des villes selon la pénétration d'Internet."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Top Cities - Public Transport Score",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cities/top/public_transport_score?top_n=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cities",
+								"top",
+								"public_transport_score"
+							],
+							"query": [
+								{
+									"key": "top_n",
+									"value": "10",
+									"description": "Nombre de villes à retourner (défaut: 10)"
+								}
+							]
+						},
+						"description": "Récupère le top N des villes selon le score de transport public."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Top Cities - Green Space Ratio",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cities/top/green_space_ratio?top_n=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cities",
+								"top",
+								"green_space_ratio"
+							],
+							"query": [
+								{
+									"key": "top_n",
+									"value": "10",
+									"description": "Nombre de villes à retourner (défaut: 10)"
+								}
+							]
+						},
+						"description": "Récupère le top N des villes selon le ratio d'espaces verts."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Top Cities - Air Quality Index",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/cities/top/air_quality_index?top_n=10",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"cities",
+								"top",
+								"air_quality_index"
+							],
+							"query": [
+								{
+									"key": "top_n",
+									"value": "10",
+									"description": "Nombre de villes à retourner (défaut: 10)"
+								}
+							]
+						},
+						"description": "Récupère le top N des villes selon l'indice de qualité de l'air."
+					},
+					"response": []
+				},
+				{
+					"name": "Compare Cities",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"cities\": [\"Paris\", \"London\", \"New York\"]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/city/comparison",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"city",
+								"comparison"
+							]
+						},
+						"description": "Compare plusieurs villes sur différentes métriques. Envoyez un tableau de noms de villes dans le body."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints liés aux données des villes"
+		},
+		{
+			"name": "Income Analysis",
+			"item": [
+				{
+					"name": "Get Income Analysis",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/income/analysis",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"income",
+								"analysis"
+							]
+						},
+						"description": "Récupère une analyse détaillée des revenus (distribution, moyennes par pays, etc.)"
+					},
+					"response": []
+				}
+			],
+			"description": "Analyse des revenus"
+		},
+		{
+			"name": "Geographic Data",
+			"item": [
+				{
+					"name": "Get Geographic Data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/geographic",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"geographic"
+							]
+						},
+						"description": "Récupère les données géographiques pour affichage sur cartes (latitude, longitude, etc.)"
+					},
+					"response": []
+				}
+			],
+			"description": "Données géographiques et cartographiques"
+		},
+		{
+			"name": "Correlations",
+			"item": [
+				{
+					"name": "Get Correlations",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/correlations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"correlations"
+							]
+						},
+						"description": "Récupère les corrélations entre les différentes variables numériques (matrice de corrélation)."
+					},
+					"response": []
+				}
+			],
+			"description": "Analyses de corrélations entre variables"
+		},
+		{
+			"name": "Quality of Life",
+			"item": [
+				{
+					"name": "Get Quality of Life Analysis",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/quality-of-life",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"quality-of-life"
+							]
+						},
+						"description": "Récupère l'analyse des facteurs de qualité de vie (transport, espaces verts, qualité de l'air, etc.)"
+					},
+					"response": []
+				}
+			],
+			"description": "Analyse de la qualité de vie"
+		},
+		{
+			"name": "Happiness",
+			"item": [
+				{
+					"name": "Get Happiness Analysis",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/happiness/analysis",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"happiness",
+								"analysis"
+							]
+						},
+						"description": "Récupère l'analyse du bonheur par pays et les facteurs qui l'influencent."
+					},
+					"response": []
+				}
+			],
+			"description": "Analyses du bonheur et bien-être"
+		},
+		{
+			"name": "Insights",
+			"item": [
+				{
+					"name": "Get Advanced Insights",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/insights",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"insights"
+							]
+						},
+						"description": "Récupère des insights avancés et des statistiques approfondies sur les données."
+					},
+					"response": []
+				}
+			],
+			"description": "Insights avancés et statistiques"
+		},
+		{
+			"name": "Filters",
+			"item": [
+				{
+					"name": "Get Filter Options",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/filters",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"api",
+								"filters"
+							]
+						},
+						"description": "Récupère les options disponibles pour les filtres (liste des pays, villes, etc.)"
+					},
+					"response": []
+				}
+			],
+			"description": "Options de filtrage disponibles"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:5000",
+			"type": "string"
+		}
+	]
+}
