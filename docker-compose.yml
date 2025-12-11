@@ -1,0 +1,35 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dashboard-api
+    restart: unless-stopped
+    ports:
+      - "${PORT:-5000}:5000"
+    environment:
+      - PORT=5000
+      - CSV_PATH=/app/data/city_lifestyle_dataset.csv
+    volumes:
+      # Monter le dossier data pour le fichier CSV
+      - ./data:/app/data:ro
+      # Optionnel : monter le code source en dev pour hot-reload
+      # - ./src:/app/src:ro
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://localhost:5000/')",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - dashboard-network
+
+networks:
+  dashboard-network:
+    driver: bridge
