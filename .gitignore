@@ -1,2 +1,16 @@
 .env
 .ruff_cache
+.venv
+.venv311
+venv/
+ENV/
+env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.log
+data/raw/
+data/cleaned/
+.DS_Store
+tmp/

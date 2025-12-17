@@ -2,6 +2,7 @@
 Module de traitement et analyse des données City Lifestyle.
 Fournit des fonctionnalités d'analyse statistique et de visualisation.
 """
+import hashlib
 from typing import Any
 
 import pandas as pd
@@ -20,17 +21,43 @@ class CityLifestyleDataProcessor:
         self.df = pd.read_csv(csv_path)
         self._preprocess_data()
 
+    def _deterministic_coordinate(self, seed: str, min_val: float, max_val: float) -> float:
+        """Génère un coordonnée déterministe pour assurer une carte exploitable sans API externe."""
+        digest = hashlib.sha256(seed.encode("utf-8")).digest()
+        fraction = int.from_bytes(digest[:8], "big") / float(1 << 64)
+        return min_val + (max_val - min_val) * fraction
+
+    def _ensure_geolocation(self) -> None:
+        """Ajoute lat/lon synthétiques si le dataset n'en dispose pas."""
+        if "latitude" not in self.df.columns or "longitude" not in self.df.columns:
+            self.df["latitude"] = self.df.apply(
+                lambda row: self._deterministic_coordinate(f"{row['city_name']}-{row['country']}", -55.0, 70.0),
+                axis=1,
+            )
+            self.df["longitude"] = self.df.apply(
+                lambda row: self._deterministic_coordinate(f"{row['country']}-{row['city_name']}", -130.0, 150.0),
+                axis=1,
+            )
+
     def _preprocess_data(self) -> None:
         """Nettoie et prepare les donnees."""
         # Convertir les colonnes numeriques
-        self.df["population_density"] = pd.to_numeric(self.df["population_density"])
-        self.df["avg_income"] = pd.to_numeric(self.df["avg_income"])
-        self.df["internet_penetration"] = pd.to_numeric(self.df["internet_penetration"])
-        self.df["avg_rent"] = pd.to_numeric(self.df["avg_rent"])
-        self.df["air_quality_index"] = pd.to_numeric(self.df["air_quality_index"])
-        self.df["public_transport_score"] = pd.to_numeric(self.df["public_transport_score"])
-        self.df["happiness_score"] = pd.to_numeric(self.df["happiness_score"])
-        self.df["green_space_ratio"] = pd.to_numeric(self.df["green_space_ratio"])
+        self._ensure_geolocation()
+        numeric_cols = [
+            "population_density",
+            "avg_income",
+            "internet_penetration",
+            "avg_rent",
+            "air_quality_index",
+            "public_transport_score",
+            "happiness_score",
+            "green_space_ratio",
+            "latitude",
+            "longitude",
+        ]
+        for col in numeric_cols:
+            if col in self.df.columns:
+                self.df[col] = pd.to_numeric(self.df[col], errors="coerce")
 
     def get_overview_stats(self) -> dict[str, Any]:
         """
@@ -91,14 +118,19 @@ class CityLifestyleDataProcessor:
         Returns:
             Dictionnaire avec les données des meilleures villes
         """
-        top_cities = self.df.nlargest(top_n, metric)[["city_name", "country", metric, "avg_income", "happiness_score"]].copy()
+        columns = ["city_name", "country", metric, "avg_income", "happiness_score"]
+        # Supprimer les doublons éventuels (metric peut être happiness_score)
+        columns = list(dict.fromkeys(columns))
+
+        top_cities = self.df.nlargest(top_n, metric)[columns].copy()
+        metric_values = top_cities[metric].to_numpy().ravel().tolist()
 
         return {
             "cities": top_cities["city_name"].tolist(),
             "countries": top_cities["country"].tolist(),
-            "metric_values": top_cities[metric].tolist(),
+            "metric_values": metric_values,
             "avg_income": top_cities["avg_income"].tolist(),
-            "happiness_score": top_cities["happiness_score"].tolist()
+            "happiness_score": top_cities["happiness_score"].tolist(),
         }
 
     def get_income_analysis(self) -> dict[str, Any]:
@@ -131,8 +163,19 @@ class CityLifestyleDataProcessor:
             Dictionnaire avec les données géographiques des villes
         """
         # On retourne les données des villes avec leurs statistiques
-        geo_data = self.df[["city_name", "country", "population_density", "avg_income",
-                            "happiness_score", "air_quality_index", "public_transport_score"]].copy()
+        geo_data = self.df[
+            [
+                "city_name",
+                "country",
+                "population_density",
+                "avg_income",
+                "happiness_score",
+                "air_quality_index",
+                "public_transport_score",
+                "latitude",
+                "longitude",
+            ]
+        ].copy()
 
         return {
             "cities": geo_data["city_name"].tolist(),
@@ -141,7 +184,9 @@ class CityLifestyleDataProcessor:
             "avg_income": geo_data["avg_income"].tolist(),
             "happiness_score": geo_data["happiness_score"].tolist(),
             "air_quality_index": geo_data["air_quality_index"].tolist(),
-            "public_transport_score": geo_data["public_transport_score"].tolist()
+            "public_transport_score": geo_data["public_transport_score"].tolist(),
+            "latitude": geo_data["latitude"].tolist(),
+            "longitude": geo_data["longitude"].tolist(),
         }
 
     def get_correlations(self) -> dict[str, Any]:

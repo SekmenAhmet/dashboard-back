@@ -45,42 +45,38 @@ cp .env.example .env
 
 Éditez le fichier `.env` et configurez :
 - `PORT` : Port du serveur (par défaut : 5000)
-- `CSV_PATH` : Chemin vers le fichier de données CSV
+- `CSV_PATH` : Chemin vers le fichier de données CSV (laisser vide pour utiliser `data/city_lifestyle_dataset.csv` → nettoyé en `data/cleaned/city_lifestyle_cleaned.csv`)
 
 ### Utilisation
 
-#### 1. Récupération des données
-
-```bash
-python src/get_data.py
-```
-
-Ce script :
-- Récupère les données depuis la source configurée
-- Les met en cache dans `data/raw/`
-- Utilise le cache si les données ont moins de 24h
-- Force le rafraîchissement avec le paramètre `force_refresh=True`
-
-#### 2. Nettoyage des données
-
-```bash
-python src/clean_data.py
-```
-
-Ce script :
-- Charge les données brutes
-- Supprime les doublons
-- Gère les valeurs manquantes
-- Valide les plages numériques
-- Sauvegarde les données nettoyées dans `data/cleaned/`
-
-#### 3. Lancement de l'API
+#### 1. Lancement de l'API (pipeline auto)
 
 ```bash
 python src/main.py
 ```
 
 L'API sera accessible sur `http://localhost:5000`
+
+Pendant le démarrage, le backend :
+- récupère le CSV (local ou URL `CSV_PATH`) vers `data/raw/` avec cache 24h,
+- nettoie les données vers `data/cleaned/city_lifestyle_cleaned.csv` (doublons, valeurs manquantes, bornage, géolocalisation synthétique),
+- charge le CSV nettoyé dans l'API.
+
+#### 2. Récupération des données (optionnel)
+
+```bash
+python src/get_data.py
+```
+
+Ce script force la mise en cache de la source (copie locale ou téléchargement HTTP) dans `data/raw/`.
+
+#### 3. Nettoyage des données (optionnel)
+
+```bash
+python src/clean_data.py
+```
+
+Ce script lit `data/city_lifestyle_dataset.csv` ou votre source, puis écrit le fichier nettoyé dans `data/cleaned/`.
 
 #### 4. Utilisation avec Docker
 
@@ -130,22 +126,23 @@ curl -X POST http://localhost:5000/api/city/comparison \
 
 ### Source des données
 
-**Dataset** : City Lifestyle Dataset
-**Fichier** : `data/city_lifestyle_dataset.csv`
-**Format** : CSV (Comma Separated Values)
-**Taille** : 299 villes (+ 1 ligne d'en-tête)
-**Régions couvertes** : Europe
+- **Dataset** : City Lifestyle Dataset (synthétique, inclus dans le repo)
+- **Fichier** : `data/city_lifestyle_dataset.csv`
+- **Format** : CSV (Comma Separated Values)
+- **Taille** : 300 lignes (299 villes + 1 en-tête)
+- **Régions couvertes** : Europe, Asie, Amériques, Afrique
+- **Accès public & reproductible** : fichier versionné dans `data/`; possibilité de remplacer par une URL publique via `CSV_PATH`
 
 ### Description du dataset
 
-Le dataset contient des informations sur la qualité de vie dans différentes villes européennes. Il permet d'analyser les facteurs qui influencent le bonheur et le bien-être des habitants.
+Le dataset contient des informations sur la qualité de vie dans différentes villes (continents multiples). Il permet d'analyser les facteurs qui influencent le bonheur et le bien-être des habitants.
 
 ### Structure des données
 
 | Colonne | Type | Description | Unité/Plage |
 |---------|------|-------------|-------------|
 | `city_name` | String | Nom de la ville | - |
-| `country` | String | Pays | Europe |
+| `country` | String | Pays | Monde (6 régions) |
 | `population_density` | Float | Densité de population | Habitants/km² (0-100000) |
 | `avg_income` | Float | Revenu moyen | €/an (0-200000) |
 | `internet_penetration` | Float | Taux de pénétration internet | % (0-100) |
@@ -154,18 +151,18 @@ Le dataset contient des informations sur la qualité de vie dans différentes vi
 | `public_transport_score` | Float | Score des transports publics | Score (0-100) |
 | `happiness_score` | Float | Indice de bonheur | Score (0-10) |
 | `green_space_ratio` | Float | Ratio d'espaces verts | % (0-100) |
+| `latitude` | Float | Latitude (synthétique si absente) | -55 à 70 |
+| `longitude` | Float | Longitude (synthétique si absente) | -130 à 150 |
 
 ### Statistiques descriptives
 
-**Observations** : 299 villes
+- Observations : 300 lignes (299 villes)
+- Variables numériques : 11 métriques continues
+- Variable catégorielle : `country`
 
-**Variables numériques** : 9 métriques continues
-
-**Variable catégorielle** : Pays (country)
-
-**Caractéristiques** :
-- Densité de population moyenne : ~3000 hab/km²
-- Revenu moyen : ~3500 €/an
+**Caractéristiques (ordre de grandeur)** :
+- Densité de population moyenne : ~3 000 hab/km²
+- Revenu moyen : ~3 500 €/an (unité interne du dataset)
 - Bonheur moyen : ~7.8/10
 - Pénétration internet : ~80%
 
@@ -176,13 +173,11 @@ Le pipeline de nettoyage ([clean_data.py](src/clean_data.py)) effectue les opér
 - Remplacement des valeurs manquantes (médiane pour numériques, "Unknown" pour texte)
 - Validation et normalisation des plages de valeurs
 - Conversion des types de données
+- Ajout de coordonnées `latitude`/`longitude` synthétiques si absentes (pour garantir la cartographie)
 
 ### Note sur la géolocalisation
 
-⚠️ **Important** : Le dataset ne contient pas de coordonnées GPS (latitude/longitude). Pour afficher les villes sur une carte, vous devrez :
-1. Ajouter les coordonnées au dataset via une API de géocodage (ex: Nominatim, Google Geocoding)
-2. Faire une jointure avec une base de données géographique
-3. Utiliser une bibliothèque de géocodage côté frontend
+Le CSV source n’inclut pas de coordonnées réelles. Des coordonnées synthétiques déterministes sont générées lors du nettoyage pour permettre l’affichage carte. Pour des positions réelles, remplacez le CSV par un fichier géocodé ou renseignez `CSV_PATH` vers une source publique contenant lat/lon.
 
 ### Accès et reproductibilité
 
@@ -408,11 +403,7 @@ fig = px.histogram(df, x="avg_income", nbins=30,
 
 ### Carte géolocalisée
 
-⚠️ **Note** : Le dataset actuel ne contient pas de coordonnées GPS. Pour créer une carte :
-
-1. Ajoutez latitude/longitude via géocodage
-2. Utilisez l'endpoint `/api/geographic` pour récupérer les données
-3. Visualisez avec une bibliothèque de cartes (Plotly, Folium, Leaflet)
+Les coordonnées lat/lon synthétiques sont générées automatiquement par `clean_data.py` pour garantir l'affichage de la carte dès l'installation. Pour remplacer par des positions réelles, fournissez un CSV géocodé ou renseignez `CSV_PATH` vers une source publique incluant `latitude` et `longitude`.
 
 ### Limites et améliorations futures
 

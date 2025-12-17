@@ -11,8 +11,8 @@ services:
       - PORT=5000
       - CSV_PATH=/app/data/city_lifestyle_dataset.csv
     volumes:
-      # Monter le dossier data pour le fichier CSV
-      - ./data:/app/data:ro
+      # Monter le dossier data (lecture/écriture pour permettre la génération de data/cleaned/)
+      - ./data:/app/data
       # Optionnel : monter le code source en dev pour hot-reload
       # - ./src:/app/src:ro
     healthcheck:

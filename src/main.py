@@ -2,17 +2,51 @@
 API Flask pour le dashboard City Lifestyle.
 Fournit des endpoints REST pour l'analyse des données urbaines.
 """
+from pathlib import Path
+from urllib.parse import urlparse
+
 from flask import Flask, Response, jsonify, request
 from flask_cors import CORS
 
-from config import csv_path, server
+from clean_data import DataCleaner
+from config import DEFAULT_CLEANED_CSV, DEFAULT_RAW_CACHE_DIR, DEFAULT_RAW_CSV, csv_path, server
 from data_processor import CityLifestyleDataProcessor
+from get_data import DataRetriever
 
 app = Flask(__name__)
 CORS(app)
 
-# Initialiser le processeur de donnees
-processor = CityLifestyleDataProcessor(csv_path)
+
+def _prepare_dataset() -> str:
+    """
+    Prépare le CSV pour l'API : récupération vers data/raw + nettoyage vers data/cleaned.
+    Renvoie le chemin final du CSV prêt à l'emploi.
+    """
+    parsed = urlparse(csv_path)
+    is_url = parsed.scheme in {"http", "https"}
+    if is_url:
+        source_file = csv_path
+    else:
+        candidate = Path(csv_path)
+        source_file = candidate if candidate.exists() else Path(DEFAULT_RAW_CSV)
+
+    # 1. Récupération dans data/raw (cache + validité)
+    retriever = DataRetriever(raw_data_dir=DEFAULT_RAW_CACHE_DIR)
+    cached_raw = retriever.get_data(str(source_file))
+
+    cleaned_path = Path(DEFAULT_CLEANED_CSV)
+    raw_mtime = Path(cached_raw).stat().st_mtime
+    # 2. Nettoyage si nécessaire
+    if cleaned_path.exists() and cleaned_path.stat().st_mtime >= raw_mtime:
+        return str(cleaned_path)
+
+    cleaner = DataCleaner()
+    cleaner.clean(cached_raw, str(cleaned_path))
+    return str(cleaned_path)
+
+
+# Initialiser le processeur de donnees avec un CSV garanti disponible
+processor = CityLifestyleDataProcessor(_prepare_dataset())
 
 
 @app.route("/")

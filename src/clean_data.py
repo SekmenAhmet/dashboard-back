@@ -2,6 +2,7 @@
 Module de nettoyage et préparation des données.
 Traite les données brutes et génère des données nettoyées prêtes à l'analyse.
 """
+import hashlib
 from pathlib import Path
 
 import pandas as pd
@@ -10,7 +11,7 @@ import pandas as pd
 class DataCleaner:
     """Gestionnaire de nettoyage et validation des données."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialise le nettoyeur de données."""
         self.df: pd.DataFrame | None = None
         self.cleaning_report: dict = {}
@@ -101,7 +102,7 @@ class DataCleaner:
             "air_quality_index": (0, 500),
             "public_transport_score": (0, 100),
             "happiness_score": (0, 10),
-            "green_space_ratio": (0, 100)
+            "green_space_ratio": (0, 100),
         }
 
         for col, (min_val, max_val) in validations.items():
@@ -125,9 +126,16 @@ class DataCleaner:
     def convert_types(self) -> None:
         """Convertit les colonnes aux types appropriés."""
         numeric_columns = [
-            "population_density", "avg_income", "internet_penetration",
-            "avg_rent", "air_quality_index", "public_transport_score",
-            "happiness_score", "green_space_ratio"
+            "population_density",
+            "avg_income",
+            "internet_penetration",
+            "avg_rent",
+            "air_quality_index",
+            "public_transport_score",
+            "happiness_score",
+            "green_space_ratio",
+            "latitude",
+            "longitude",
         ]
 
         for col in numeric_columns:
@@ -135,6 +143,27 @@ class DataCleaner:
                 self.df[col] = pd.to_numeric(self.df[col], errors="coerce")
 
         print("✓ Types de données convertis")
+
+    def _deterministic_coordinate(self, seed: str, min_val: float, max_val: float) -> float:
+        """Génère un couple lat/lon déterministe à partir de la ville."""
+        digest = hashlib.sha256(seed.encode("utf-8")).digest()
+        fraction = int.from_bytes(digest[:8], "big") / float(1 << 64)
+        return min_val + (max_val - min_val) * fraction
+
+    def ensure_geolocation(self) -> None:
+        """Ajoute des coordonnées synthétiques si absentes pour permettre la cartographie."""
+        if "latitude" not in self.df.columns or "longitude" not in self.df.columns:
+            print("→ Ajout de coordonnées synthétiques (dataset sans lat/lon)")
+            self.df["latitude"] = self.df.apply(
+                lambda row: self._deterministic_coordinate(f"{row['city_name']}-{row['country']}", -55.0, 70.0),
+                axis=1,
+            )
+            self.df["longitude"] = self.df.apply(
+                lambda row: self._deterministic_coordinate(f"{row['country']}-{row['city_name']}", -130.0, 150.0),
+                axis=1,
+            )
+        else:
+            print("✓ Coordonnées présentes dans le dataset")
 
     def generate_statistics(self) -> dict:
         """
@@ -148,7 +177,7 @@ class DataCleaner:
             "total_columns": len(self.df.columns),
             "countries": len(self.df["country"].unique()),
             "cities": len(self.df["city_name"].unique()),
-            "numeric_summary": self.df.describe().to_dict()
+            "numeric_summary": self.df.describe().to_dict(),
         }
 
         return stats
@@ -193,6 +222,7 @@ class DataCleaner:
         duplicates = self.remove_duplicates()
         missing = self.handle_missing_values()
         outliers = self.validate_numeric_ranges()
+        self.ensure_geolocation()
 
         # Générer les statistiques
         stats = self.generate_statistics()
@@ -202,7 +232,7 @@ class DataCleaner:
             "duplicates_removed": duplicates,
             "missing_values": missing,
             "outliers_found": outliers,
-            "final_statistics": stats
+            "final_statistics": stats,
         }
 
         # Sauvegarder
@@ -217,7 +247,7 @@ class DataCleaner:
         return self.cleaning_report
 
 
-def main():
+def main() -> None:
     """Point d'entrée principal pour le nettoyage des données."""
     # Configuration des chemins
     base_dir = Path(__file__).parent.parent

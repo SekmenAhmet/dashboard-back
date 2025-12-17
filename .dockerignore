@@ -13,6 +13,11 @@ build
 venv/
 ENV/
 env/
+.venv311
+data/raw/
+data/cleaned/
+.DS_Store
+tmp/
 .git
 .gitignore
 *.md
