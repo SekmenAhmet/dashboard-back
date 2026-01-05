@@ -21,7 +21,7 @@ jobs:
           cache: pip
 
       - name: Install dependencies
-        run: pip install -r --no-cache-dir requirements.txt
+        run: pip install --no-cache-dir -r requirements.txt
 
       - name: Check dependencies
         run: pip check
