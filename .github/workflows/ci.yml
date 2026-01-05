@@ -21,7 +21,7 @@ jobs:
         cache: pip
     
     - name: Install dependencies
-      run: pip install -r --no-cache-dir requirements.txt
+      run: pip install -r --no-cache-dir requirements.txts
 
     - name: Check packages compatible dependencies
       run: pip check 
@@ -30,4 +30,11 @@ jobs:
       run: docker compose build --no-cache
 
     - name : Start service
-      run: docker compose up
+      run: docker compose up -d
+
+    - name: Stop service
+      if: always()
+      run: docker compose down
+
+    - name: Smoke test
+     run: docker compose exec app python --version
