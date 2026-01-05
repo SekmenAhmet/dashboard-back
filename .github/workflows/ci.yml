@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request: 
+    branches: [main]
+
+jobs:
+  validate: Validate & Build
+  runs-on: ubuntu-latest
+
+  steps:
+    - name: checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set-up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+        cache: pip
+    
+    - name: Install dependencies
+      run: pip install -r --no-cache-dir requirements.txt
+
+    - name: Check packages compatible dependencies
+      run: pip check 
+
+    - name: Docker Build
+      run: docker compose build --no-cache
+
+    - name : Start service
+      run: docker compose up

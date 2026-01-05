@@ -144,24 +144,39 @@ class DataCleaner:
 
         print("✓ Types de données convertis")
 
-    def _deterministic_coordinate(self, seed: str, min_val: float, max_val: float) -> float:
-        """Génère un couple lat/lon déterministe à partir de la ville."""
+    def _continent_box(self, continent: str) -> tuple[float, float, float, float]:
+        """Retourne un bounding box réaliste (lat_min, lat_max, lon_min, lon_max) par continent."""
+        boxes = {
+            "Europe": (35.0, 70.0, -10.0, 40.0),
+            "Asia": (5.0, 55.0, 60.0, 140.0),
+            "North America": (25.0, 70.0, -130.0, -60.0),
+            "South America": (-55.0, 15.0, -80.0, -35.0),
+            "Africa": (-35.0, 35.0, -20.0, 50.0),
+            "Oceania": (-50.0, 5.0, 110.0, 150.0),
+        }
+        return boxes.get(continent, (-55.0, 70.0, -130.0, 150.0))
+
+    def _deterministic_point(self, seed: str, continent: str) -> tuple[float, float]:
+        """Génère une paire lat/lon déterministe dans un bounding box de continent."""
         digest = hashlib.sha256(seed.encode("utf-8")).digest()
-        fraction = int.from_bytes(digest[:8], "big") / float(1 << 64)
-        return min_val + (max_val - min_val) * fraction
+        frac_lat = int.from_bytes(digest[:8], "big") / float(1 << 64)
+        frac_lon = int.from_bytes(digest[8:16], "big") / float(1 << 64)
+        lat_min, lat_max, lon_min, lon_max = self._continent_box(continent)
+        lat = lat_min + (lat_max - lat_min) * frac_lat
+        lon = lon_min + (lon_max - lon_min) * frac_lon
+        return lat, lon
 
     def ensure_geolocation(self) -> None:
         """Ajoute des coordonnées synthétiques si absentes pour permettre la cartographie."""
         if "latitude" not in self.df.columns or "longitude" not in self.df.columns:
-            print("→ Ajout de coordonnées synthétiques (dataset sans lat/lon)")
-            self.df["latitude"] = self.df.apply(
-                lambda row: self._deterministic_coordinate(f"{row['city_name']}-{row['country']}", -55.0, 70.0),
+            print("→ Ajout de coordonnées synthétiques (ancrées par continent)")
+            coords = self.df.apply(
+                lambda row: self._deterministic_point(f"{row['city_name']}-{row['country']}", row["country"]),
                 axis=1,
+                result_type="expand",
             )
-            self.df["longitude"] = self.df.apply(
-                lambda row: self._deterministic_coordinate(f"{row['country']}-{row['city_name']}", -130.0, 150.0),
-                axis=1,
-            )
+            coords.columns = ["latitude", "longitude"]
+            self.df[["latitude", "longitude"]] = coords
         else:
             print("✓ Coordonnées présentes dans le dataset")
 

@@ -130,21 +130,22 @@ curl -X POST http://localhost:5000/api/city/comparison \
 - **Fichier** : `data/city_lifestyle_dataset.csv`
 - **Format** : CSV (Comma Separated Values)
 - **Taille** : 300 lignes (299 villes + 1 en-tête)
-- **Régions couvertes** : Europe, Asie, Amériques, Afrique
+- **Régions couvertes** : Europe, Asie, Afrique, Amérique du Nord, Amérique du Sud, Océanie
 - **Accès public & reproductible** : fichier versionné dans `data/`; possibilité de remplacer par une URL publique via `CSV_PATH`
 
 ### Description du dataset
 
 Le dataset contient des informations sur la qualité de vie dans différentes villes (continents multiples). Il permet d'analyser les facteurs qui influencent le bonheur et le bien-être des habitants.
+Note : dans le dataset fourni, la colonne `country` contient des continents/régions (ex. Europe, Asia), pas des pays au sens strict.
 
 ### Structure des données
 
 | Colonne | Type | Description | Unité/Plage |
 |---------|------|-------------|-------------|
 | `city_name` | String | Nom de la ville | - |
-| `country` | String | Pays | Monde (6 régions) |
+| `country` | String | Région/continent | 6 régions |
 | `population_density` | Float | Densité de population | Habitants/km² (0-100000) |
-| `avg_income` | Float | Revenu moyen | €/an (0-200000) |
+| `avg_income` | Float | Revenu moyen | €/mois (0-10000) |
 | `internet_penetration` | Float | Taux de pénétration internet | % (0-100) |
 | `avg_rent` | Float | Loyer moyen | €/mois (0-50000) |
 | `air_quality_index` | Float | Indice de qualité de l'air | AQI (0-500) |
@@ -158,11 +159,11 @@ Le dataset contient des informations sur la qualité de vie dans différentes vi
 
 - Observations : 300 lignes (299 villes)
 - Variables numériques : 11 métriques continues
-- Variable catégorielle : `country`
+- Variable catégorielle : `country` (continent)
 
 **Caractéristiques (ordre de grandeur)** :
 - Densité de population moyenne : ~3 000 hab/km²
-- Revenu moyen : ~3 500 €/an (unité interne du dataset)
+- Revenu moyen : ~3 500 €/mois (unité interne du dataset)
 - Bonheur moyen : ~7.8/10
 - Pénétration internet : ~80%
 
@@ -339,7 +340,7 @@ Principales dépendances :
 
 ### Objectif du projet
 
-Analyser les facteurs qui influencent la qualité de vie et le bonheur dans les villes européennes, en étudiant les corrélations entre différentes métriques urbaines.
+Analyser les facteurs qui influencent la qualité de vie et le bonheur dans des villes à travers plusieurs continents, en étudiant les corrélations entre différentes métriques urbaines.
 
 ### Métriques analysées
 
@@ -361,8 +362,8 @@ Le dashboard analyse 9 variables principales :
    - Corrélation bonheur ↔ espaces verts
 
 2. **Existe-t-il des différences régionales ?**
-   - Comparaison des moyennes par pays
-   - Identification des pays les plus performants
+   - Comparaison des moyennes par région/continent
+   - Identification des régions les plus performantes
 
 3. **Quelles villes offrent la meilleure qualité de vie ?**
    - Top 10 villes par métrique
@@ -373,8 +374,8 @@ Le dashboard analyse 9 variables principales :
 L'API fournit plusieurs endpoints d'analyse :
 
 - **`/api/correlations`** : Matrice de corrélation entre toutes les variables
-- **`/api/insights`** : Insights automatiques (pays le plus heureux, meilleurs transports, etc.)
-- **`/api/happiness/analysis`** : Analyse détaillée du bonheur par pays
+- **`/api/insights`** : Insights automatiques (région la plus heureuse, meilleurs transports, etc.)
+- **`/api/happiness/analysis`** : Analyse détaillée du bonheur par région
 
 ### Méthodologie
 
@@ -403,7 +404,7 @@ fig = px.histogram(df, x="avg_income", nbins=30,
 
 ### Carte géolocalisée
 
-Les coordonnées lat/lon synthétiques sont générées automatiquement par `clean_data.py` pour garantir l'affichage de la carte dès l'installation. Pour remplacer par des positions réelles, fournissez un CSV géocodé ou renseignez `CSV_PATH` vers une source publique incluant `latitude` et `longitude`.
+Les coordonnées lat/lon synthétiques sont générées automatiquement par `clean_data.py` avec des bounding boxes par continent (Europe, Asie, Amériques, Afrique, Océanie) afin de limiter les points dans les océans. Pour des positions réelles, fournissez un CSV géocodé ou renseignez `CSV_PATH` vers une source publique incluant `latitude` et `longitude`.
 
 ### Limites et améliorations futures
 

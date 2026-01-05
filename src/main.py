@@ -35,11 +35,7 @@ def _prepare_dataset() -> str:
     cached_raw = retriever.get_data(str(source_file))
 
     cleaned_path = Path(DEFAULT_CLEANED_CSV)
-    raw_mtime = Path(cached_raw).stat().st_mtime
-    # 2. Nettoyage si nécessaire
-    if cleaned_path.exists() and cleaned_path.stat().st_mtime >= raw_mtime:
-        return str(cleaned_path)
-
+    # 2. Nettoyage à chaque démarrage (dataset petit) pour garantir coordonnées et règles à jour
     cleaner = DataCleaner()
     cleaner.clean(cached_raw, str(cleaned_path))
     return str(cleaned_path)
