@@ -38,15 +38,6 @@ source venv/bin/activate  # Sur Windows: venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-4. Configurez les variables d'environnement :
-```bash
-cp .env.example .env
-```
-
-Éditez le fichier `.env` et configurez :
-- `PORT` : Port du serveur (par défaut : 5000)
-- `CSV_PATH` : Chemin vers le fichier de données CSV (laisser vide pour utiliser `data/city_lifestyle_dataset.csv` → nettoyé en `data/cleaned/city_lifestyle_cleaned.csv`)
-
 ### Utilisation
 
 #### 1. Lancement de l'API (pipeline auto)
@@ -58,7 +49,7 @@ python src/main.py
 L'API sera accessible sur `http://localhost:5000`
 
 Pendant le démarrage, le backend :
-- récupère le CSV (local ou URL `CSV_PATH`) vers `data/raw/` avec cache 24h,
+- récupère le CSV depuis `data/city_lifestyle_dataset.csv` vers `data/raw/` avec cache 24h,
 - nettoie les données vers `data/cleaned/city_lifestyle_cleaned.csv` (doublons, valeurs manquantes, bornage, géolocalisation synthétique),
 - charge le CSV nettoyé dans l'API.
 
@@ -200,12 +191,10 @@ dashboard-back/
 │   └── city_lifestyle_dataset.csv # Dataset source
 ├── src/                          # Code source
 │   ├── main.py                  # Point d'entrée API Flask
-│   ├── config.py                # Configuration (env variables)
+│   ├── config.py                # Configuration
 │   ├── get_data.py              # Récupération et cache
 │   ├── clean_data.py            # Nettoyage des données
 │   └── data_processor.py        # Traitement et analyse
-├── .env                         # Variables d'environnement (git-ignored)
-├── .env.example                 # Template de configuration
 ├── .ruff.toml                   # Configuration du linter
 ├── requirements.txt             # Dépendances Python
 ├── Dockerfile                   # Configuration Docker
@@ -303,13 +292,11 @@ Pour tester l'API manuellement :
 1. Importez la collection Postman : `Dashboard_API.postman_collection.json`
 2. Ou utilisez curl/httpie pour les requêtes
 
-#### Variables d'environnement
+#### Configuration
 
-Créez un fichier `.env` à la racine avec :
-```
-PORT=5000
-CSV_PATH=./data/city_lifestyle_dataset.csv
-```
+Le backend est configuré pour fonctionner directement sans configuration supplémentaire :
+- **Port** : 5000 (par défaut)
+- **CSV source** : `data/city_lifestyle_dataset.csv`
 
 ### Dépendances
 
@@ -322,7 +309,7 @@ Principales dépendances :
 - **numpy** (1.26.2) : Calculs numériques
 - **plotly** (5.18.0) : Visualisations (si besoin)
 - **scipy** (1.11.4) : Statistiques avancées
-- **python-dotenv** (1.0.0) : Variables d'environnement
+- **requests** (2.31.0) : Requêtes HTTP
 - **ruff** (0.1.8) : Linting et formatage
 
 ### Workflow de développement
