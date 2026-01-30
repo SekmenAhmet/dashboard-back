@@ -379,7 +379,7 @@ L'API fournit plusieurs endpoints d'analyse :
 
 ### Méthodologie
 
-1. **Collecte** : Dataset de 299 villes européennes
+1. **Collecte** : Dataset de 299 villes réparties sur 6 continents (Europe, Asie, Afrique, Amériques, Océanie)
 2. **Nettoyage** : Pipeline automatisé (doublons, valeurs manquantes, outliers)
 3. **Analyse** : Statistiques descriptives, corrélations, comparaisons
 4. **API** : Exposition des données via endpoints REST pour visualisation
@@ -409,15 +409,17 @@ Les coordonnées lat/lon synthétiques sont générées automatiquement par `cle
 ### Limites et améliorations futures
 
 **Limites actuelles** :
-- Absence de coordonnées GPS pour la cartographie
-- Dataset limité à l'Europe
-- Pas de données temporelles (évolution)
+- Coordonnées GPS synthétiques (non réelles) pour la cartographie
+- Dataset synthétique (non basé sur des données réelles)
+- Pas de données temporelles (évolution dans le temps)
+- Distribution inégale entre continents (Europe: 60 villes, Asie: 80, Afrique: 35, etc.)
 
 **Améliorations possibles** :
-- Ajouter d'autres régions du monde
-- Intégrer des séries temporelles
-- Ajouter plus de métriques (éducation, santé, sécurité)
+- Intégrer des données réelles avec coordonnées GPS précises
+- Ajouter des séries temporelles pour suivre l'évolution
+- Ajouter plus de métriques (éducation, santé, sécurité, crime)
 - Modèles prédictifs du bonheur
+- Équilibrer la répartition géographique des villes
 
 ---
 
