@@ -23,7 +23,7 @@ Backend REST API pour le dashboard d'analyse du style de vie urbain. Fournit des
 
 1. Clonez le repository :
 ```bash
-git clone <repository-url>
+git clone https://github.com/SekmenAhmet/dashboard-back.git
 cd dashboard-back
 ```
 
@@ -122,7 +122,7 @@ curl -X POST http://localhost:5000/api/city/comparison \
 - **Format** : CSV (Comma Separated Values)
 - **Taille** : 300 lignes (299 villes + 1 en-tête)
 - **Régions couvertes** : Europe, Asie, Afrique, Amérique du Nord, Amérique du Sud, Océanie
-- **Accès public & reproductible** : fichier versionné dans `data/`; possibilité de remplacer par une URL publique via `CSV_PATH`
+- **Accès public & reproductible** : fichier versionné dans `data/`
 
 ### Description du dataset
 
@@ -169,7 +169,7 @@ Le pipeline de nettoyage ([clean_data.py](src/clean_data.py)) effectue les opér
 
 ### Note sur la géolocalisation
 
-Le CSV source n’inclut pas de coordonnées réelles. Des coordonnées synthétiques déterministes sont générées lors du nettoyage pour permettre l’affichage carte. Pour des positions réelles, remplacez le CSV par un fichier géocodé ou renseignez `CSV_PATH` vers une source publique contenant lat/lon.
+Le CSV source n'inclut pas de coordonnées réelles. Des coordonnées synthétiques déterministes sont générées automatiquement lors du nettoyage pour permettre l'affichage sur carte.
 
 ### Accès et reproductibilité
 
@@ -312,15 +312,6 @@ Principales dépendances :
 - **requests** (2.31.0) : Requêtes HTTP
 - **ruff** (0.1.8) : Linting et formatage
 
-### Workflow de développement
-
-1. Créer une branche feature
-2. Faire vos modifications
-3. Lancer ruff : `ruff check --fix src/`
-4. Tester l'API localement
-5. Committer et push
-6. Créer une Pull Request
-
 ---
 
 ## Rapport d'analyse
@@ -391,7 +382,7 @@ fig = px.histogram(df, x="avg_income", nbins=30,
 
 ### Carte géolocalisée
 
-Les coordonnées lat/lon synthétiques sont générées automatiquement par `clean_data.py` avec des bounding boxes par continent (Europe, Asie, Amériques, Afrique, Océanie) afin de limiter les points dans les océans. Pour des positions réelles, fournissez un CSV géocodé ou renseignez `CSV_PATH` vers une source publique incluant `latitude` et `longitude`.
+Les coordonnées lat/lon synthétiques sont générées automatiquement par `clean_data.py` avec des bounding boxes par continent (Europe, Asie, Amériques, Afrique, Océanie) afin de limiter les points dans les océans.
 
 ### Limites et améliorations futures
 
@@ -421,7 +412,7 @@ Ce projet est développé dans un cadre éducatif à l'ESIEE Paris.
 
 ### Auteurs
 
-Projet réalisé par l'équipe de développement du City Lifestyle Dashboard.
+**Ahmet Sekmen** - ESIEE Paris (2024-2025)
 
 ### Technologies utilisées
 
@@ -448,5 +439,3 @@ Ce projet est destiné à un usage éducatif uniquement. Toute utilisation comme
 ---
 
 **Version** : 1.0.0
-**Dernière mise à jour** : Décembre 2024
-**Contact** : Voir le fichier CONTRIBUTORS ou les commits Git
