@@ -64,12 +64,10 @@ class DataRetriever:
         filename = Path(urlparse(source_path).path).name
         cached_file = self.raw_data_dir / filename
 
-        # Vérifier si le cache est valide
         if not force_refresh and self._is_cache_valid(cached_file):
             print(f"✓ Utilisation du cache: {cached_file}")
             return str(cached_file)
 
-        # Copier ou télécharger les données vers le cache
         print(f"→ Récupération des données depuis: {source_path}")
 
         if self._is_url(source_path):
@@ -95,17 +93,14 @@ class DataRetriever:
 
 def main():
     """Point d'entrée principal pour la récupération des données."""
-    # Configuration
     base_dir = Path(__file__).resolve().parent.parent
     data_source = base_dir / "data" / "city_lifestyle_dataset.csv"
 
-    # Initialiser le récupérateur
     retriever = DataRetriever(
         raw_data_dir=DEFAULT_RAW_DIR,
         cache_duration_hours=24,
     )
 
-    # Récupérer les données
     try:
         cached_path = retriever.get_data(str(data_source))
         print(f"\n✓ Données disponibles: {cached_path}")

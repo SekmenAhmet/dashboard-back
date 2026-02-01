@@ -30,18 +30,15 @@ def _prepare_dataset() -> str:
         candidate = Path(csv_path)
         source_file = candidate if candidate.exists() else Path(DEFAULT_RAW_CSV)
 
-    # 1. Récupération dans data/raw (cache + validité)
     retriever = DataRetriever(raw_data_dir=DEFAULT_RAW_CACHE_DIR)
     cached_raw = retriever.get_data(str(source_file))
 
     cleaned_path = Path(DEFAULT_CLEANED_CSV)
-    # 2. Nettoyage à chaque démarrage (dataset petit) pour garantir coordonnées et règles à jour
     cleaner = DataCleaner()
     cleaner.clean(cached_raw, str(cleaned_path))
     return str(cleaned_path)
 
 
-# Initialiser le processeur de donnees avec un CSV garanti disponible
 processor = CityLifestyleDataProcessor(_prepare_dataset())
 
 

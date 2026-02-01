@@ -56,7 +56,6 @@ class CityLifestyleDataProcessor:
 
     def _preprocess_data(self) -> None:
         """Nettoie et prepare les donnees."""
-        # Convertir les colonnes numeriques
         self._ensure_geolocation()
         numeric_cols = [
             "population_density",
@@ -134,7 +133,6 @@ class CityLifestyleDataProcessor:
             Dictionnaire avec les données des meilleures villes
         """
         columns = ["city_name", "country", metric, "avg_income", "happiness_score"]
-        # Supprimer les doublons éventuels (metric peut être happiness_score)
         columns = list(dict.fromkeys(columns))
 
         if metric == "air_quality_index":
@@ -180,7 +178,6 @@ class CityLifestyleDataProcessor:
         Returns:
             Dictionnaire avec les données géographiques des villes
         """
-        # On retourne les données des villes avec leurs statistiques
         geo_data = self.df[
             [
                 "city_name",
@@ -362,7 +359,6 @@ class CityLifestyleDataProcessor:
         if "max_income" in filters and filters["max_income"]:
             filtered_df = filtered_df[filtered_df["avg_income"] <= filters["max_income"]]
 
-        # Temporairement remplacer le dataframe
         original_df = self.df
         self.df = filtered_df
         return original_df

@@ -58,7 +58,6 @@ class DataCleaner:
         """
         missing_stats = {}
 
-        # Identifier les valeurs manquantes
         missing_counts = self.df.isnull().sum()
         columns_with_missing = missing_counts[missing_counts > 0]
 
@@ -66,18 +65,15 @@ class DataCleaner:
             print("✓ Aucune valeur manquante détectée")
             return missing_stats
 
-        # Traiter chaque colonne avec des valeurs manquantes
         for col in columns_with_missing.index:
             missing_count = int(missing_counts[col])
             missing_stats[col] = missing_count
 
-            # Pour les colonnes numériques, remplacer par la médiane
             if self.df[col].dtype in ["float64", "int64"]:
                 median_value = self.df[col].median()
                 self.df[col].fillna(median_value, inplace=True)
                 print(f"✓ {missing_count} valeurs manquantes dans '{col}' remplacées par la médiane ({median_value:.2f})")
 
-            # Pour les colonnes textuelles, remplacer par 'Unknown'
             else:
                 self.df[col].fillna("Unknown", inplace=True)
                 print(f"✓ {missing_count} valeurs manquantes dans '{col}' remplacées par 'Unknown'")
@@ -93,7 +89,6 @@ class DataCleaner:
         """
         outliers = {}
 
-        # Définir les contraintes de validation
         validations = {
             "population_density": (0, 100000),
             "avg_income": (0, 200000),
@@ -107,14 +102,12 @@ class DataCleaner:
 
         for col, (min_val, max_val) in validations.items():
             if col in self.df.columns:
-                # Identifier les valeurs hors limites
                 out_of_range = self.df[(self.df[col] < min_val) | (self.df[col] > max_val)]
 
                 if len(out_of_range) > 0:
                     outliers[col] = len(out_of_range)
                     print(f"⚠ {len(out_of_range)} valeurs hors limites dans '{col}' (attendu: {min_val}-{max_val})")
 
-                    # Capper les valeurs aux limites
                     self.df[col] = self.df[col].clip(min_val, max_val)
                     print(f"✓ Valeurs normalisées dans la plage {min_val}-{max_val}")
 
@@ -204,11 +197,9 @@ class DataCleaner:
         Args:
             output_path: Chemin du fichier de sortie
         """
-        # Créer le répertoire si nécessaire
         output_file = Path(output_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
-        # Sauvegarder
         self.df.to_csv(output_path, index=False)
         print(f"✓ Données nettoyées sauvegardées dans: {output_path}")
 
@@ -227,22 +218,17 @@ class DataCleaner:
         print("DÉBUT DU NETTOYAGE DES DONNÉES")
         print("=" * 60 + "\n")
 
-        # Charger les données
         self.load_data(input_path)
 
-        # Convertir les types
         self.convert_types()
 
-        # Nettoyer
         duplicates = self.remove_duplicates()
         missing = self.handle_missing_values()
         outliers = self.validate_numeric_ranges()
         self.ensure_geolocation()
 
-        # Générer les statistiques
         stats = self.generate_statistics()
 
-        # Créer le rapport
         self.cleaning_report = {
             "duplicates_removed": duplicates,
             "missing_values": missing,
@@ -250,7 +236,6 @@ class DataCleaner:
             "final_statistics": stats,
         }
 
-        # Sauvegarder
         self.save_cleaned_data(output_path)
 
         print("\n" + "=" * 60)
@@ -264,12 +249,10 @@ class DataCleaner:
 
 def main() -> None:
     """Point d'entrée principal pour le nettoyage des données."""
-    # Configuration des chemins
     base_dir = Path(__file__).parent.parent
     input_file = base_dir / "data" / "city_lifestyle_dataset.csv"
     output_file = base_dir / "data" / "cleaned" / "city_lifestyle_cleaned.csv"
 
-    # Créer et exécuter le nettoyeur
     cleaner = DataCleaner()
 
     try:
